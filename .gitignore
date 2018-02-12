@@ -1,0 +1,19 @@
+# General
+**/target/
+env.properties
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# IDEA
+*.iml
+*.iws
+*.ipr
+.idea/
+
+# NetBeans
+nbproject/
+nbactions.xml
+nb-configuration.xml
