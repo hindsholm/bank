@@ -2,16 +2,13 @@ package dk.hindsholm.bank.boundary;
 
 import dk.hindsholm.bank.entity.Account;
 import dk.hindsholm.bank.entity.Transaction;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 import javax.ws.rs.core.UriInfo;
 
 public class EntityBuilder {
@@ -34,7 +31,7 @@ public class EntityBuilder {
                 .build();
     }
 
-    JsonValue buildAccountsJsonArray(List<Account> accounts, UriInfo uriInfo) {
+    JsonArray buildAccountsJsonArray(List<Account> accounts, UriInfo uriInfo) {
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Account account : accounts) {
             URI self = buildAccountLink(account, uriInfo);
