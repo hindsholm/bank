@@ -72,25 +72,21 @@ public class AccountResource {
     @Consumes({MediaType.APPLICATION_JSON + ";v=1", MediaType.APPLICATION_JSON})
     public Response createOrUpdate(@PathParam("regNo") @Pattern(regexp = "^[0-9]{4}$") String regNo,
             @PathParam("accountNo") @Pattern(regexp = "^[0-9]+$") String accountNo,
-            @Valid AccountUpdate account,
+            @Valid AccountUpdate update,
             @Context UriInfo uriInfo, @Context Request request) {
-        if (!regNo.equals(account.getRegNo()) || !accountNo.equals(account.getAccountNo())) {
+        if (!regNo.equals(update.getRegNo()) || !accountNo.equals(update.getAccountNo())) {
             throw new BadInputException("Account in uri " + regNo + "-" + accountNo + " is not matching account in body "
-                    + account.getRegNo() + "-" + account.getAccountNo() + "!");
+                    + update.getRegNo() + "-" + update.getAccountNo() + "!");
         }
 
-        Optional<Account> acc = admin.findAccount(regNo, accountNo);
-        Account a;
-        if (acc.isPresent()) {
-            a = acc.get();
-            a.setName(account.getName());
-        } else {
-            a = new Account(regNo, accountNo, account.getName());
-        }
-        admin.save(a);
+        Account account = admin.findAccount(regNo, accountNo).map(acc -> {
+            acc.setName(update.getName());
+            return acc;
+        }).orElse(new Account(regNo, accountNo, update.getName()));
+        admin.save(account);
         CacheControl cc = new CacheControl();
         cc.setMaxAge(60);
-        return Response.ok(entityBuilder.buildAccountJson(a, uriInfo)).cacheControl(cc).build();
+        return Response.ok(entityBuilder.buildAccountJson(account, uriInfo)).cacheControl(cc).build();
     }
 
 }
