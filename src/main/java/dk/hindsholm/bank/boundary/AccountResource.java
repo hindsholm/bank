@@ -49,11 +49,15 @@ public class AccountResource {
         return Response.ok(entityBuilder.buildAccountsJson(accounts, uriInfo)).cacheControl(cc).build();
     }
 
+    /**
+     * GETs a specific account.
+     * If the account does not exist, 404 is returned.
+     */
     @GET
     @Path("{regNo}-{accountNo}")
     @Produces({"application/hal+json;v=1", "application/hal+json"})
-    public Response get(@PathParam("regNo") @Pattern(regexp = "^[0-9]{4}$") String regNo,
-            @PathParam("accountNo") @Pattern(regexp = "^[0-9]+$") String accountNo,
+    public Response get(@PathParam("regNo") @Pattern(regexp = "^\\d{4}$") String regNo,
+            @PathParam("accountNo") @Pattern(regexp = "^\\d+$") String accountNo,
             @Context UriInfo uriInfo, @Context Request request) {
         Optional<Account> account = admin.findAccount(regNo, accountNo);
         if (account.isPresent()) {
@@ -65,6 +69,9 @@ public class AccountResource {
         }
     }
 
+    /**
+     * Updates an account.
+     */
     @PUT
     @RolesAllowed("advisor")
     @Path("{regNo}-{accountNo}")

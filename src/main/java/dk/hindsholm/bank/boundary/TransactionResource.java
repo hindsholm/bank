@@ -27,6 +27,9 @@ public class TransactionResource {
     @Inject
     EntityBuilder entityBuilder;
 
+    /**
+     * Lists all transactions for the given account.
+     */
     @GET
     @Produces({"application/hal+json;v=1", "application/hal+json"})
     public Response list(@PathParam("regNo") String regNo, @PathParam("accountNo") String accountNo,
@@ -41,6 +44,9 @@ public class TransactionResource {
         }
     }
 
+    /**
+     * GETs a specific transaction.
+     */
     @GET
     @Path("{id}")
     @Produces({"application/hal+json;v=1", "application/hal+json"})
