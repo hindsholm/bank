@@ -55,10 +55,14 @@ public class AccountResource {
     public Response get(@PathParam("regNo") @Pattern(regexp = "^[0-9]{4}$") String regNo,
             @PathParam("accountNo") @Pattern(regexp = "^[0-9]+$") String accountNo,
             @Context UriInfo uriInfo, @Context Request request) {
-        Account account = admin.getAccount(regNo, accountNo);
-        CacheControl cc = new CacheControl();
-        cc.setMaxAge(60);
-        return Response.ok(entityBuilder.buildAccountJson(account, uriInfo)).cacheControl(cc).build();
+        Optional<Account> account = admin.findAccount(regNo, accountNo);
+        if (account.isPresent()) {
+            CacheControl cc = new CacheControl();
+            cc.setMaxAge(60);
+            return Response.ok(entityBuilder.buildAccountJson(account.get(), uriInfo)).cacheControl(cc).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
     @PUT
@@ -71,8 +75,8 @@ public class AccountResource {
             @Valid AccountUpdate account,
             @Context UriInfo uriInfo, @Context Request request) {
         if (!regNo.equals(account.getRegNo()) || !accountNo.equals(account.getAccountNo())) {
-            throw new BadInputException("Account in uri " + regNo + "-" + accountNo + " is not matching account in body " + 
-                    account.getRegNo() + "-" + account.getAccountNo() + "!");
+            throw new BadInputException("Account in uri " + regNo + "-" + accountNo + " is not matching account in body "
+                    + account.getRegNo() + "-" + account.getAccountNo() + "!");
         }
 
         Optional<Account> acc = admin.findAccount(regNo, accountNo);

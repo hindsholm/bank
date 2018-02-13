@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Optional;
 
 import javax.json.JsonObject;
 import javax.ws.rs.core.Request;
@@ -52,7 +53,7 @@ public class TransactionResourceTest {
         when(account.getRegNo()).thenReturn("5479");
         when(account.getAccountNo()).thenReturn("123456");
         when(account.getTransactions()).thenReturn(Collections.singleton(new Transaction(account, new BigDecimal("1234.42"), "description")));
-        when(admin.getAccount("5479", "123456")).thenReturn(account);
+        when(admin.findAccount("5479", "123456")).thenReturn(Optional.of(account));
 
         JsonObject json = (JsonObject) service.list("5479", "123456", uriInfo, request).getEntity();
 
@@ -66,7 +67,7 @@ public class TransactionResourceTest {
         when(account.getRegNo()).thenReturn("5479");
         when(account.getAccountNo()).thenReturn("123456");
         Transaction dbTranscation = new Transaction(account, new BigDecimal("1234.42"), "description");
-        when(admin.getTransaction("5479", "123456", "xxx-yyy")).thenReturn(dbTranscation);
+        when(admin.findTransaction("5479", "123456", "xxx-yyy")).thenReturn(Optional.of(dbTranscation));
 
         JsonObject json = (JsonObject) service.get("5479", "123456", "xxx-yyy", uriInfo, request).getEntity();
 

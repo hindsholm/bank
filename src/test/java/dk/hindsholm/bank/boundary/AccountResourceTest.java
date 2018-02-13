@@ -55,7 +55,7 @@ public class AccountResourceTest {
 
     @Test
     public void testGet() {
-        when(admin.getAccount("5479", "1234")).thenReturn(new Account("5479", "1234", "Savings account"));
+        when(admin.findAccount("5479", "1234")).thenReturn(Optional.of(new Account("5479", "1234", "Savings account")));
 
         JsonObject json = (JsonObject) service.get("5479", "1234", uriInfo, request).getEntity();
 
