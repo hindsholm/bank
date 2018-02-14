@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import javax.json.JsonObject;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import static org.junit.Assert.assertEquals;
@@ -62,6 +63,15 @@ public class AccountResourceTest {
         assertEquals("5479", json.getString("regNo"));
         assertEquals("1234", json.getString("accountNo"));
         assertEquals("http://mock/accounts/5479-1234", json.getJsonObject("_links").getJsonObject("self").getString("href"));
+    }
+
+    @Test
+    public void testGetNotFound() {
+        when(admin.findAccount("5479", "1234")).thenReturn(Optional.empty());
+
+        Response response = service.get("5479", "1234", uriInfo, request);
+
+        assertEquals(404, response.getStatus());
     }
 
     @Test
