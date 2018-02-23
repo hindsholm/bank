@@ -1,0 +1,3 @@
+# Create users with empty password
+create-file-user --passwordfile /opt/payara/password.txt --groups=customers customer
+create-file-user --passwordfile /opt/payara/password.txt --groups=advisors advisor
