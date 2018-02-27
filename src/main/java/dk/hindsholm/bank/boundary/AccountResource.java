@@ -5,7 +5,6 @@ import dk.hindsholm.bank.entity.Account;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.security.DeclareRoles;
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -27,7 +26,6 @@ import javax.ws.rs.core.UriInfo;
 
 @Stateless
 @Path("/accounts")
-@PermitAll
 @DeclareRoles("advisor")
 public class AccountResource {
 
