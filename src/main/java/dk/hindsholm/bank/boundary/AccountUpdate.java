@@ -26,4 +26,17 @@ public class AccountUpdate {
     public String getName() {
         return name;
     }
+
+    public void setRegNo(String regNo) {
+        this.regNo = regNo;
+    }
+
+    public void setAccountNo(String accountNo) {
+        this.accountNo = accountNo;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
 }

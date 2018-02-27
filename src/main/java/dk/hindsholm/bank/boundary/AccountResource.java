@@ -41,7 +41,7 @@ public class AccountResource {
      * Lists all accounts.
      */
     @GET
-    @Produces({"application/hal+json;v=1", "application/hal+json"})
+    @Produces("application/hal+json")
     public Response list(@Context UriInfo uriInfo, @Context Request request) {
         List<Account> accounts = admin.listAccounts();
         CacheControl cc = new CacheControl();
@@ -55,7 +55,7 @@ public class AccountResource {
      */
     @GET
     @Path("{regNo}-{accountNo}")
-    @Produces({"application/hal+json;v=1", "application/hal+json"})
+    @Produces("application/hal+json")
     public Response get(@PathParam("regNo") @Pattern(regexp = "^\\d{4}$") String regNo,
             @PathParam("accountNo") @Pattern(regexp = "^\\d+$") String accountNo,
             @Context UriInfo uriInfo, @Context Request request) {
@@ -68,15 +68,15 @@ public class AccountResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
-
+    
     /**
      * Updates an account.
      */
     @PUT
     @RolesAllowed("advisor")
     @Path("{regNo}-{accountNo}")
-    @Produces({"application/hal+json"})
-    @Consumes({MediaType.APPLICATION_JSON + ";v=1", MediaType.APPLICATION_JSON})
+    @Produces("application/hal+json")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrUpdate(@PathParam("regNo") @Pattern(regexp = "^[0-9]{4}$") String regNo,
             @PathParam("accountNo") @Pattern(regexp = "^[0-9]+$") String accountNo,
             @Valid AccountUpdate update,
