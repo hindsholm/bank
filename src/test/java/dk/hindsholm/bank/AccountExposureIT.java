@@ -6,8 +6,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -60,7 +59,7 @@ public class AccountExposureIT {
         assertEquals("Checkings Account", response.get("name"));
     }
 
-    @Test(expected = NotAuthorizedException.class)
+    @Test(expected = NotFoundException.class)
     public void testUnknownUser() {
         Map<String, String> accountCreate = new HashMap<>();
         accountCreate.put("regNo", "5479");
@@ -73,7 +72,7 @@ public class AccountExposureIT {
                 .put(Entity.entity(accountCreate, MediaType.APPLICATION_JSON_TYPE), Map.class);
     }
 
-    @Test(expected = ForbiddenException.class)
+    @Test(expected = NotFoundException.class)
     public void testUserNotInRequiredGroup() {
         Map<String, String> accountCreate = new HashMap<>();
         accountCreate.put("regNo", "5479");
