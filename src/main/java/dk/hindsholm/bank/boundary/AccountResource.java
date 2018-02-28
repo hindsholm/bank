@@ -20,7 +20,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -35,12 +34,15 @@ public class AccountResource {
     @Inject
     EntityBuilder entityBuilder;
 
+    @Context
+    UriInfo uriInfo;
+
     /**
      * Lists all accounts.
      */
     @GET
     @Produces("application/hal+json")
-    public Response list(@Context UriInfo uriInfo, @Context Request request) {
+    public Response list() {
         List<Account> accounts = admin.listAccounts();
         CacheControl cc = new CacheControl();
         cc.setMaxAge(10);
@@ -55,8 +57,7 @@ public class AccountResource {
     @Path("{regNo}-{accountNo}")
     @Produces("application/hal+json")
     public Response get(@PathParam("regNo") @Pattern(regexp = "^\\d{4}$") String regNo,
-            @PathParam("accountNo") @Pattern(regexp = "^\\d+$") String accountNo,
-            @Context UriInfo uriInfo, @Context Request request) {
+            @PathParam("accountNo") @Pattern(regexp = "^\\d+$") String accountNo) {
         Optional<Account> account = admin.findAccount(regNo, accountNo);
         if (account.isPresent()) {
             CacheControl cc = new CacheControl();
@@ -77,8 +78,7 @@ public class AccountResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrUpdate(@PathParam("regNo") @Pattern(regexp = "^[0-9]{4}$") String regNo,
             @PathParam("accountNo") @Pattern(regexp = "^[0-9]+$") String accountNo,
-            @Valid AccountUpdate update,
-            @Context UriInfo uriInfo, @Context Request request) {
+            @Valid AccountUpdate update) {
         if (!regNo.equals(update.getRegNo()) || !accountNo.equals(update.getAccountNo())) {
             throw new BadInputException("Account in uri " + regNo + "-" + accountNo + " is not matching account in body "
                     + update.getRegNo() + "-" + update.getAccountNo() + "!");

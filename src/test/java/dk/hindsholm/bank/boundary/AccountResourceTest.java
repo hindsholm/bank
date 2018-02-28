@@ -5,7 +5,6 @@ import dk.hindsholm.bank.entity.Account;
 import java.util.Arrays;
 import java.util.Optional;
 import javax.json.JsonObject;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -26,17 +25,14 @@ public class AccountResourceTest {
     @Mock
     AccountAdministration admin;
 
-    @InjectMocks
-    AccountResource service;
-    
     @Mock
     UriInfo uriInfo;
-    
-    @Mock
-    Request request;
-    
+
     @Spy
     EntityBuilder entityBuilder;
+
+    @InjectMocks
+    AccountResource service;
 
     @Before
     public void before() {
@@ -48,7 +44,7 @@ public class AccountResourceTest {
         when(admin.listAccounts())
             .thenReturn(Arrays.asList(new Account("5479", "1", "Checking account"), new Account("5479", "2", "Savings account")));
 
-        JsonObject json = (JsonObject) service.list(uriInfo, request).getEntity();
+        JsonObject json = (JsonObject) service.list().getEntity();
 
         assertEquals(2, json.getJsonObject("_embedded").getJsonArray("accounts").size());
         assertEquals("http://mock/accounts", json.getJsonObject("_links").getJsonObject("self").getString("href"));
@@ -58,7 +54,7 @@ public class AccountResourceTest {
     public void testGet() {
         when(admin.findAccount("5479", "1234")).thenReturn(Optional.of(new Account("5479", "1234", "Savings account")));
 
-        JsonObject json = (JsonObject) service.get("5479", "1234", uriInfo, request).getEntity();
+        JsonObject json = (JsonObject) service.get("5479", "1234").getEntity();
 
         assertEquals("5479", json.getString("regNo"));
         assertEquals("1234", json.getString("accountNo"));
@@ -69,7 +65,7 @@ public class AccountResourceTest {
     public void testGetNotFound() {
         when(admin.findAccount("5479", "1234")).thenReturn(Optional.empty());
 
-        Response response = service.get("5479", "1234", uriInfo, request);
+        Response response = service.get("5479", "1234");
 
         assertEquals(404, response.getStatus());
     }
@@ -82,7 +78,7 @@ public class AccountResourceTest {
         when(accountUpdate.getAccountNo()).thenReturn("12345678");
         when(admin.findAccount("5479", "12345678")).thenReturn(Optional.empty());
 
-        JsonObject json = (JsonObject) service.createOrUpdate("5479", "12345678", accountUpdate, uriInfo, request).getEntity();
+        JsonObject json = (JsonObject) service.createOrUpdate("5479", "12345678", accountUpdate).getEntity();
 
         assertEquals("new Account", json.getString("name"));
         assertEquals("5479", json.getString("regNo"));
@@ -99,7 +95,7 @@ public class AccountResourceTest {
         when(accountUpdate.getRegNo()).thenReturn("5479");
         when(accountUpdate.getAccountNo()).thenReturn("12345678");
 
-        JsonObject json = (JsonObject) service.createOrUpdate("5479", "12345678", accountUpdate, uriInfo, request).getEntity();
+        JsonObject json = (JsonObject) service.createOrUpdate("5479", "12345678", accountUpdate).getEntity();
 
         assertEquals("new name", account.getName());
         assertEquals("new name", json.getString("name"));
@@ -113,6 +109,6 @@ public class AccountResourceTest {
         AccountUpdate accountUpdate = mock(AccountUpdate.class);
         when(accountUpdate.getRegNo()).thenReturn("5479");
         when(accountUpdate.getAccountNo()).thenReturn("12345678");
-        service.createOrUpdate("5479", "87654321", accountUpdate, uriInfo, request);
+        service.createOrUpdate("5479", "87654321", accountUpdate);
     }
 }
