@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import javax.json.JsonObject;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
@@ -33,15 +32,12 @@ public class TransactionResourceTest {
     @Spy
     EntityBuilder entityBuilder;
 
+    @Mock
+    UriInfo uriInfo;
+
     @InjectMocks
     TransactionResource service;
 
-    @Mock
-    Request request;
-    
-    @Mock
-    UriInfo uriInfo;
-    
     @Before
     public void before() {
         when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromPath("http://mock"));        
@@ -55,7 +51,7 @@ public class TransactionResourceTest {
         when(account.getTransactions()).thenReturn(Collections.singleton(new Transaction(account, new BigDecimal("1234.42"), "description")));
         when(admin.findAccount("5479", "123456")).thenReturn(Optional.of(account));
 
-        JsonObject json = (JsonObject) service.list("5479", "123456", uriInfo, request).getEntity();
+        JsonObject json = (JsonObject) service.list("5479", "123456").getEntity();
 
         assertEquals(1, json.getJsonObject("_embedded").getJsonArray("transactions").size());
         assertEquals("http://mock/accounts/5479-123456/transactions", json.getJsonObject("_links").getJsonObject("self").getString("href"));
@@ -69,7 +65,7 @@ public class TransactionResourceTest {
         Transaction dbTranscation = new Transaction(account, new BigDecimal("1234.42"), "description");
         when(admin.findTransaction("5479", "123456", "xxx-yyy")).thenReturn(Optional.of(dbTranscation));
 
-        JsonObject json = (JsonObject) service.get("5479", "123456", "xxx-yyy", uriInfo, request).getEntity();
+        JsonObject json = (JsonObject) service.get("5479", "123456", "xxx-yyy").getEntity();
 
         assertEquals(new BigDecimal("1234.42"), json.getJsonNumber("amount").bigDecimalValue());
         assertEquals("http://mock/accounts/5479-123456/transactions/" + dbTranscation.getId(), 

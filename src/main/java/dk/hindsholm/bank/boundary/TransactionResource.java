@@ -13,7 +13,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -26,14 +25,16 @@ public class TransactionResource {
 
     @Inject
     EntityBuilder entityBuilder;
+    
+    @Context
+    UriInfo uriInfo;
 
     /**
      * Lists all transactions for the given account.
      */
     @GET
-    @Produces({"application/hal+json;v=1", "application/hal+json"})
-    public Response list(@PathParam("regNo") String regNo, @PathParam("accountNo") String accountNo,
-            @Context UriInfo uriInfo, @Context Request request) {
+    @Produces("application/hal+json")
+    public Response list(@PathParam("regNo") String regNo, @PathParam("accountNo") String accountNo) {
         Optional<Account> account = admin.findAccount(regNo, accountNo);
         if (account.isPresent()) {
             CacheControl cc = new CacheControl();
@@ -49,9 +50,8 @@ public class TransactionResource {
      */
     @GET
     @Path("{id}")
-    @Produces({"application/hal+json;v=1", "application/hal+json"})
-    public Response get(@PathParam("regNo") String regNo, @PathParam("accountNo") String accountNo, @PathParam("id") String id,
-            @Context UriInfo uriInfo, @Context Request request) {
+    @Produces("application/hal+json")
+    public Response get(@PathParam("regNo") String regNo, @PathParam("accountNo") String accountNo, @PathParam("id") String id) {
         Optional<Transaction> transaction = admin.findTransaction(regNo, accountNo, id);
         if (transaction.isPresent()) {
             CacheControl cc = new CacheControl();
