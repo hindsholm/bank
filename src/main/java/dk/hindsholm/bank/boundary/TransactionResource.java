@@ -31,6 +31,8 @@ public class TransactionResource {
 
     /**
      * Lists all transactions for the given account.
+     * @param regNo Bank registration number
+     * @param accountNo Account number
      */
     @GET
     @Produces("application/hal+json")
@@ -47,6 +49,9 @@ public class TransactionResource {
 
     /**
      * GETs a specific transaction.
+     * @param regNo Bank registration number
+     * @param accountNo Account number
+     * @param id Transaction ID
      */
     @GET
     @Path("{id}")

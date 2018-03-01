@@ -52,6 +52,8 @@ public class AccountResource {
     /**
      * GETs a specific account.
      * If the account does not exist, 404 is returned.
+     * @param regNo Bank registration number
+     * @param accountNo Account number
      */
     @GET
     @Path("{regNo}-{accountNo}")
@@ -70,6 +72,9 @@ public class AccountResource {
     
     /**
      * Updates an account.
+     * @param regNo Bank registration number
+     * @param accountNo Account number
+     * @param update Object containing the data with which to update the account
      */
     @PUT
     @RolesAllowed("advisor")
