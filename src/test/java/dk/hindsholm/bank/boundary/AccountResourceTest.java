@@ -1,5 +1,8 @@
 package dk.hindsholm.bank.boundary;
 
+import com.atlassian.oai.validator.SwaggerRequestResponseValidator;
+import static com.atlassian.oai.validator.model.Request.Method.GET;
+import static com.atlassian.oai.validator.model.Request.Method.PUT;
 import dk.hindsholm.bank.control.AccountAdministration;
 import dk.hindsholm.bank.entity.Account;
 import java.util.Arrays;
@@ -33,10 +36,17 @@ public class AccountResourceTest {
 
     @InjectMocks
     AccountResource service;
+    
+    SwaggerValidator validator;
 
     @Before
     public void before() {
         when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromPath("http://mock"));        
+        SwaggerRequestResponseValidator srrv = SwaggerRequestResponseValidator
+                .createFor("target/jaxrs-analyzer/swagger.json")
+                .withBasePathOverride("http://mock")
+                .build();
+        validator = new SwaggerValidator(srrv);
     }
     
     @Test
@@ -44,8 +54,10 @@ public class AccountResourceTest {
         when(admin.listAccounts())
             .thenReturn(Arrays.asList(new Account("5479", "1", "Checking account"), new Account("5479", "2", "Savings account")));
 
-        JsonObject json = (JsonObject) service.list().getEntity();
+        Response response = service.list();
 
+        validator.validate(GET, "http://mock/accounts", response);
+        JsonObject json = (JsonObject) response.getEntity();
         assertEquals(2, json.getJsonObject("_embedded").getJsonArray("accounts").size());
         assertEquals("http://mock/accounts", json.getJsonObject("_links").getJsonObject("self").getString("href"));
     }
@@ -54,8 +66,10 @@ public class AccountResourceTest {
     public void testGet() {
         when(admin.findAccount("5479", "1234")).thenReturn(Optional.of(new Account("5479", "1234", "Savings account")));
 
-        JsonObject json = (JsonObject) service.get("5479", "1234").getEntity();
+        Response response = service.get("5479", "1234");
 
+        validator.validate(GET, "http://mock/accounts/5479-1234", response);
+        JsonObject json = (JsonObject) response.getEntity();
         assertEquals("5479", json.getString("regNo"));
         assertEquals("1234", json.getString("accountNo"));
         assertEquals("http://mock/accounts/5479-1234", json.getJsonObject("_links").getJsonObject("self").getString("href"));
@@ -67,6 +81,7 @@ public class AccountResourceTest {
 
         Response response = service.get("5479", "1234");
 
+        validator.validate(GET, "http://mock/accounts/5479-1234", response);
         assertEquals(404, response.getStatus());
     }
 
@@ -78,8 +93,10 @@ public class AccountResourceTest {
         when(accountUpdate.getAccountNo()).thenReturn("12345678");
         when(admin.findAccount("5479", "12345678")).thenReturn(Optional.empty());
 
-        JsonObject json = (JsonObject) service.createOrUpdate("5479", "12345678", accountUpdate).getEntity();
+        Response response = service.createOrUpdate("5479", "12345678", accountUpdate);
 
+        validator.validate(PUT, "http://mock/accounts/5479-12345678", response);
+        JsonObject json = (JsonObject) response.getEntity();
         assertEquals("new Account", json.getString("name"));
         assertEquals("5479", json.getString("regNo"));
         assertEquals("12345678", json.getString("accountNo"));
@@ -95,8 +112,10 @@ public class AccountResourceTest {
         when(accountUpdate.getRegNo()).thenReturn("5479");
         when(accountUpdate.getAccountNo()).thenReturn("12345678");
 
-        JsonObject json = (JsonObject) service.createOrUpdate("5479", "12345678", accountUpdate).getEntity();
+        Response response = service.createOrUpdate("5479", "12345678", accountUpdate);
 
+        validator.validate(PUT, "http://mock/accounts/5479-12345678", response);
+        JsonObject json = (JsonObject) response.getEntity();
         assertEquals("new name", account.getName());
         assertEquals("new name", json.getString("name"));
         assertEquals("5479", json.getString("regNo"));
@@ -111,4 +130,5 @@ public class AccountResourceTest {
         when(accountUpdate.getAccountNo()).thenReturn("12345678");
         service.createOrUpdate("5479", "87654321", accountUpdate);
     }
+
 }
