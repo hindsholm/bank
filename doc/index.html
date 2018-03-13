@@ -38,30 +38,35 @@ class: center, middle
 
 # Agenda
 
-1. [Swagger-Core Annotations](https://github.com/swagger-api/swagger-core/wiki/Annotations-2.X)
+1. [Swagger-Core Annotations](https://github.com/swagger-api/swagger-core/wiki/Annotations-1.5.X)
 2. [JAX-RS Analyzer](https://github.com/sdaschner/jaxrs-analyzer)
-3. ...
 
 ---
 
 # Swagger-Core Annotations
 
 ```java
+
+
+
+
+
+
 @GET
 @Path("{regNo}-{accountNo}")
-@Produces({"application/hal+json", "application/hal+json;concept=account;v=1"})
-@ApiOperation(value = "Gets the information from a single account", 
-    response = AccountRepresentation.class,
-    extensions = {@Extension(name = "roles", properties = {
-        @ExtensionProperty(name = "customer", value = "customer..."),
-        @ExtensionProperty(name = "advisor", value = "advisor ...")}
-    )},
-    produces = "application/hal+json, application/hal+json;concept=account;v=1",
-    notes = "...", nickname = "getAccount")
+@Produces({ "application/hal+json;v=1", "application/hal+json" })
+@ApiOperation(value = "GETs a specific account.",
+    notes = "If the account does not exist, 404 is returned.",
+    produces = "application/hal+json;v=1, application/hal+json",
+    response = AccountRepresentation.class)
+@ApiResponses(value = {
+    @ApiResponse(code = 404, message = "No account found.")
+})
 public Response get(
-    @Context UriInfo uriInfo, @Context Request request,
-    @PathParam("regNo") @Pattern(regexp = "^[0-9]{4}$") String regNo,
-    @PathParam("accountNo") @Pattern(regexp = "^[0-9]+$") String accountNo) {
+    @ApiParam(value = "Bank registration number") 
+        @PathParam("regNo") @Pattern(regexp = "^\\d{4}$") String regNo,
+    @ApiParam(value = "Account number")
+        @PathParam("accountNo") @Pattern(regexp = "^\\d+$") String accountNo) {
     ...
 }
 ```
@@ -79,9 +84,18 @@ public Response get(
 */
 @GET
 @Path("{regNo}-{accountNo}")
-@Produces("application/hal+json")
+@Produces({ "application/hal+json;v=1", "application/hal+json" })
+
+
+
+
+
+
+
 public Response get(
+
     @PathParam("regNo") @Pattern(regexp = "^\\d{4}$") String regNo,
+
     @PathParam("accountNo") @Pattern(regexp = "^\\d+$") String accountNo) {
     ...
 }
