@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>JAX-RS Swagger Documentation</title>
+    <meta charset="utf-8">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+        @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+        body {
+            font-family: 'Droid Serif';
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Yanone Kaffeesatz';
+            font-weight: normal;
+        }
+
+        .remark-code,
+        .remark-inline-code {
+            font-family: 'Ubuntu Mono';
+        }
+    </style>
+</head>
+
+<body>
+    <textarea id="source">
+
+class: center, middle
+
+# Generating Swagger for JAX-RS
+
+---
+
+# Agenda
+
+1. [Swagger-Core Annotations](https://github.com/swagger-api/swagger-core/wiki/Annotations-2.X)
+2. [JAX-RS Analyzer](https://github.com/sdaschner/jaxrs-analyzer)
+3. ...
+
+---
+
+# Swagger-Core Annotations
+
+```java
+@GET
+@Path("{regNo}-{accountNo}")
+@Produces({"application/hal+json", "application/hal+json;concept=account;v=1"})
+@ApiOperation(value = "Gets the information from a single account", 
+    response = AccountRepresentation.class,
+    extensions = {@Extension(name = "roles", properties = {
+        @ExtensionProperty(name = "customer", value = "customer..."),
+        @ExtensionProperty(name = "advisor", value = "advisor ...")}
+    )},
+    produces = "application/hal+json, application/hal+json;concept=account;v=1",
+    notes = "...", nickname = "getAccount")
+public Response get(
+    @Context UriInfo uriInfo, @Context Request request,
+    @PathParam("regNo") @Pattern(regexp = "^[0-9]{4}$") String regNo,
+    @PathParam("accountNo") @Pattern(regexp = "^[0-9]+$") String accountNo) {
+    ...
+}
+```
+
+---
+
+# JAX-RS Analyzer
+
+```java
+/**
+* GETs a specific account.
+* If the account does not exist, 404 is returned.
+* @param regNo Bank registration number
+* @param accountNo Account number
+*/
+@GET
+@Path("{regNo}-{accountNo}")
+@Produces("application/hal+json")
+public Response get(
+    @PathParam("regNo") @Pattern(regexp = "^\\d{4}$") String regNo,
+    @PathParam("accountNo") @Pattern(regexp = "^\\d+$") String accountNo) {
+    ...
+}
+```
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script>
+        var slideshow = remark.create();
+    </script>
+</body>
+
+</html>
