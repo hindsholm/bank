@@ -1,0 +1,323 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "More simplification attempts...",
+        "version": "1.0.0-SNAPSHOT",
+        "title": "A simpler Nykredit REST Archetype Project"
+    },
+    "host": "services.nykredit.dk",
+    "basePath": "/simpler",
+    "tags": [{ "name": "accounts" }, { "name": "accounts{regNo}-{accountNo}transactions" }],
+    "schemes": ["http", "https"],
+    "paths": {
+        "/accounts#v=1": {
+            "get": {
+                "tags": ["accounts"],
+                "summary": "List all accounts",
+                "operationId": "listAccounts",
+                "produces": ["application/hal+json;v=1", "application/hal+json"],
+                "parameters": [
+                    {
+                        "name": "X-Archetype",
+                        "in": "header",
+                        "description": "Parameter on archetype only! Used as guard against reported swagger issue!",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": { "200": { "description": "successful operation", "schema": { "$ref": "#/definitions/AccountsRepresentation" } } },
+                "security": [{ "oauth2": [] }]
+            }
+        },
+        "/accounts/{regNo}-{accountNo}#v=1": {
+            "get": {
+                "tags": ["accounts"],
+                "summary": "GETs a specific account.",
+                "description": "If the account does not exist, 404 is returned.",
+                "operationId": "get",
+                "produces": ["application/hal+json;v=1", "application/hal+json"],
+                "parameters": [
+                    {
+                        "name": "regNo",
+                        "in": "path",
+                        "description": "Bank registration number",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[0-9]{4}$"
+                    },
+                    {
+                        "name": "accountNo",
+                        "in": "path",
+                        "description": "Account number",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[0-9]+$"
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "successful operation", "schema": { "$ref": "#/definitions/AccountRepresentation" } },
+                    "404": { "description": "No account found." }
+                },
+                "security": [{ "oauth2": [] }]
+            },
+            "put": {
+                "tags": ["accounts"],
+                "summary": "Create new or update existing account",
+                "operationId": "updateAccount",
+                "consumes": ["application/json;v=1", "application/json"],
+                "produces": ["application/hal+json"],
+                "parameters": [
+                    { "name": "regNo", "in": "path", "required": true, "type": "string", "pattern": "^[0-9]{4}$" },
+                    { "name": "accountNo", "in": "path", "required": true, "type": "string", "pattern": "^[0-9]+$" },
+                    { "in": "body", "name": "body", "required": false, "schema": { "$ref": "#/definitions/AccountUpdateRepresentation" } }
+                ],
+                "responses": {
+                    "200": { "description": "successful operation", "schema": { "$ref": "#/definitions/AccountRepresentation" } },
+                    "400": { "description": "No updating possible" }
+                },
+                "security": [{ "oauth2": [] }]
+            }
+        },
+        "/accounts/{regNo}-{accountNo}/transactions#v=1": {
+            "get": {
+                "tags": ["accounts{regNo}-{accountNo}transactions"],
+                "summary": "List all transactions on account",
+                "operationId": "listTransactions",
+                "produces": ["application/hal+json;v=1", "application/hal+json"],
+                "parameters": [
+                    { "name": "regNo", "in": "path", "required": true, "type": "string" },
+                    { "name": "accountNo", "in": "path", "required": true, "type": "string" },
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "description":
+                            "Default that is set to application/hal+json and that will return the most recent version of content. If you want another version use application/hal+json;v=(the version)",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "_^application/hal+json[;v=[0_9]+]"
+                    },
+                    {
+                        "name": "X-Log-Token",
+                        "in": "header",
+                        "description":
+                            "A Correlation ID that consumers can specify to ensure traceability from own logs. If not present a token will be generated and returned in response",
+                        "required": false,
+                        "type": "string",
+                        "pattern": "_^[a_zA_Z0-9]{36}"
+                    },
+                    {
+                        "name": "X-Client-Version",
+                        "in": "header",
+                        "description": "A Client version ID is recommended for traceability from own logs.",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "_^[0-9]{1}.[0-9]{1}.[0-9]{1}"
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "successful operation", "schema": { "$ref": "#/definitions/TransactionsRepresentation" } },
+                    "400": {
+                        "description": "Bad Request - the contents of the request were semantically or syntactically wrong.",
+                        "schema": { "$ref": "#/definitions/ErrorRepresentation" },
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "401": {
+                        "description": "Not Authorized for the resource.",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "403": {
+                        "description": "Forbidden access to the resource.",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "406": {
+                        "description": "Not Acceptable - Possible mismatch between headers and content",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "500": {
+                        "description": "The server experienced a currently unknown problem.",
+                        "schema": { "$ref": "#/definitions/ErrorRepresentation" }
+                    },
+                    "301": {
+                        "description": "Resource has moved.",
+                        "headers": {
+                            "Location": { "type": "string", "description": "The Location is used to state where resource can be found" },
+                            "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified - Resource was not updated",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "404": {
+                        "description": "Resource Not Found.",
+                        "schema": { "$ref": "#/definitions/ErrorRepresentation" },
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    }
+                },
+                "security": [{ "Bearer": [] }]
+            }
+        },
+        "/accounts/{regNo}-{accountNo}/transactions/{id}#v=1": {
+            "get": {
+                "tags": ["accounts{regNo}-{accountNo}transactions"],
+                "summary": "Get single transaction on account",
+                "operationId": "getTransaction",
+                "produces": ["application/hal+json;v=1", "application/hal+json"],
+                "parameters": [
+                    { "name": "regNo", "in": "path", "required": true, "type": "string" },
+                    { "name": "accountNo", "in": "path", "required": true, "type": "string" },
+                    { "name": "id", "in": "path", "required": true, "type": "string" },
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "description":
+                            "Default that is set to application/hal+json and that will return the most recent version of content. If you want another version use application/hal+json;v=(the version)",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "_^application/hal+json[;v=[0_9]+]"
+                    },
+                    {
+                        "name": "X-Log-Token",
+                        "in": "header",
+                        "description":
+                            "A Correlation ID that consumers can specify to ensure traceability from own logs. If not present a token will be generated and returned in response",
+                        "required": false,
+                        "type": "string",
+                        "pattern": "_^[a_zA_Z0-9]{36}"
+                    },
+                    {
+                        "name": "X-Client-Version",
+                        "in": "header",
+                        "description": "A Client version ID is recommended for traceability from own logs.",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "_^[0-9]{1}.[0-9]{1}.[0-9]{1}"
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "successful operation", "schema": { "$ref": "#/definitions/TransactionRepresentation" } },
+                    "404": { "description": "No transaction found." },
+                    "400": {
+                        "description": "Bad Request - the contents of the request were semantically or syntactically wrong.",
+                        "schema": { "$ref": "#/definitions/ErrorRepresentation" },
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "401": {
+                        "description": "Not Authorized for the resource.",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "403": {
+                        "description": "Forbidden access to the resource.",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "406": {
+                        "description": "Not Acceptable - Possible mismatch between headers and content",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    },
+                    "500": {
+                        "description": "The server experienced a currently unknown problem.",
+                        "schema": { "$ref": "#/definitions/ErrorRepresentation" }
+                    },
+                    "301": {
+                        "description": "Resource has moved.",
+                        "headers": {
+                            "Location": { "type": "string", "description": "The Location is used to state where resource can be found" },
+                            "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified - Resource was not updated",
+                        "headers": { "X-Log-Token": { "type": "string", "description": "A Correlation ID for consumer use" } }
+                    }
+                },
+                "security": [{ "Bearer": [] }]
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "An OAuth2 bearer token in the format: Bearer (token)",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "definitions": {
+        "AccountRepresentation": {
+            "type": "object",
+            "properties": {
+                "regNo": { "type": "string" },
+                "accountNo": { "type": "string" },
+                "name": { "type": "string" },
+                "_links": {
+                    "type": "object",
+                    "properties": { "account:transactions": { "$ref": "#/definitions/HALLink" }, "self": { "$ref": "#/definitions/HALLink" } }
+                },
+                "_embedded": {
+                    "type": "object",
+                    "properties": { "transactions": { "type": "array", "items": { "$ref": "#/definitions/TransactionRepresentation" } } }
+                }
+            }
+        },
+        "HALLink": {
+            "type": "object",
+            "properties": {
+                "href": { "type": "string", "xml": { "attribute": true } },
+                "templated": { "type": "boolean", "xml": { "attribute": true } },
+                "type": { "type": "string", "xml": { "attribute": true } },
+                "deprecation": { "type": "string", "format": "url", "xml": { "attribute": true } },
+                "name": { "type": "string", "xml": { "attribute": true } },
+                "profile": { "type": "string", "format": "uri", "xml": { "attribute": true } },
+                "title": { "type": "string", "xml": { "attribute": true } },
+                "hreflang": { "type": "string", "xml": { "attribute": true } }
+            }
+        },
+        "TransactionRepresentation": {
+            "type": "object",
+            "properties": {
+                "id": { "type": "string" },
+                "description": { "type": "string" },
+                "amount": { "type": "string" },
+                "_links": { "type": "object", "properties": { "self": { "$ref": "#/definitions/HALLink" } } }
+            }
+        },
+        "AccountsRepresentation": {
+            "type": "object",
+            "properties": {
+                "_links": { "type": "object", "properties": { "self": { "$ref": "#/definitions/HALLink" } } },
+                "_embedded": {
+                    "type": "object",
+                    "properties": { "accounts": { "type": "array", "items": { "$ref": "#/definitions/AccountRepresentation" } } }
+                }
+            }
+        },
+        "AccountUpdateRepresentation": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+                "regNo": { "type": "string", "pattern": "^[0-9]{4}$" },
+                "accountNo": { "type": "string", "pattern": "^[0-9]+$" },
+                "name": { "type": "string", "pattern": ".{1,40}" }
+            }
+        },
+        "TransactionsRepresentation": {
+            "type": "object",
+            "properties": {
+                "_links": { "type": "object", "properties": { "self": { "$ref": "#/definitions/HALLink" } } },
+                "_embedded": {
+                    "type": "object",
+                    "properties": { "transactions": { "type": "array", "items": { "$ref": "#/definitions/TransactionRepresentation" } } }
+                }
+            }
+        },
+        "ErrorRepresentation": {
+            "type": "object",
+            "properties": {
+                "msg": { "type": "string" },
+                "sid": { "type": "string" },
+                "values": { "type": "object", "additionalProperties": { "type": "object" } },
+                "_links": { "type": "object", "properties": { "resource": { "$ref": "#/definitions/HALLink" } } }
+            }
+        }
+    }
+}

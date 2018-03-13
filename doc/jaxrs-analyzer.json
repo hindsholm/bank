@@ -1,0 +1,356 @@
+
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0-SNAPSHOT",
+        "title": "bank"
+    },
+    "host": "bank.hindsholm.dk",
+    "basePath": "/resources",
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/accounts": {
+            "get": {
+                "description": "Lists all accounts.",
+                "consumes": [
+                ],
+                "produces": [
+                    "application/hal+json"
+                ],
+                "parameters": [
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "Cache-Control": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/JsonObject_11"
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts/{regNo}-{accountNo}": {
+            "get": {
+                "description": "GETs a specific account.\r\nIf the account does not exist, 404 is returned.",
+                "consumes": [
+                ],
+                "produces": [
+                    "application/hal+json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "accountNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Account number"
+                    },
+                    {
+                        "type": "string",
+                        "name": "regNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Bank registration number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "Cache-Control": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/JsonObject_12"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "headers": {
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an account.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/hal+json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "accountNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Account number"
+                    },
+                    {
+                        "type": "string",
+                        "name": "regNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Bank registration number"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AccountUpdate"
+                        },
+                        "description": "Object containing the data with which to update the account"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "Cache-Control": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/JsonObject_12"
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts/{regNo}-{accountNo}/transactions": {
+            "get": {
+                "description": "Lists all transactions for the given account.",
+                "consumes": [
+                ],
+                "produces": [
+                    "application/hal+json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "accountNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Account number"
+                    },
+                    {
+                        "type": "string",
+                        "name": "regNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Bank registration number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "Cache-Control": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/JsonObject_6"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "headers": {
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts/{regNo}-{accountNo}/transactions/{id}": {
+            "get": {
+                "description": "GETs a specific transaction.",
+                "consumes": [
+                ],
+                "produces": [
+                    "application/hal+json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "accountNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Account number"
+                    },
+                    {
+                        "type": "string",
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Transaction ID"
+                    },
+                    {
+                        "type": "string",
+                        "name": "regNo",
+                        "in": "path",
+                        "required": true,
+                        "description": "Bank registration number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "Cache-Control": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/JsonObject_3"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "headers": {
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AccountUpdate": {
+            "properties": {
+                "accountNo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "regNo": {
+                    "type": "string"
+                }
+            }
+        },
+        "JsonObject": {
+            "properties": {
+                "href": {
+                    "type": "string"
+                }
+            }
+        },
+        "JsonObject_10": {
+            "properties": {
+                "accounts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/JsonObject_8"
+                    }
+                }
+            }
+        },
+        "JsonObject_11": {
+            "properties": {
+                "_embedded": {
+                    "$ref": "#/definitions/JsonObject_10"
+                },
+                "_links": {
+                    "$ref": "#/definitions/JsonObject_2"
+                }
+            }
+        },
+        "JsonObject_12": {
+            "properties": {
+                "_embedded": {
+                    "$ref": "#/definitions/JsonObject_5"
+                },
+                "_links": {
+                    "$ref": "#/definitions/JsonObject_2"
+                },
+                "accountNo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "regNo": {
+                    "type": "string"
+                }
+            }
+        },
+        "JsonObject_2": {
+            "properties": {
+                "self": {
+                    "$ref": "#/definitions/JsonObject"
+                }
+            }
+        },
+        "JsonObject_3": {
+            "properties": {
+                "_links": {
+                    "$ref": "#/definitions/JsonObject_2"
+                },
+                "amount": {
+                    "type": "number"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "JsonObject_5": {
+            "properties": {
+                "transactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/JsonObject_3"
+                    }
+                }
+            }
+        },
+        "JsonObject_6": {
+            "properties": {
+                "_embedded": {
+                    "$ref": "#/definitions/JsonObject_5"
+                },
+                "_links": {
+                    "$ref": "#/definitions/JsonObject_2"
+                }
+            }
+        },
+        "JsonObject_7": {
+            "properties": {
+                "account:transactions": {
+                    "$ref": "#/definitions/JsonObject"
+                },
+                "self": {
+                    "$ref": "#/definitions/JsonObject"
+                }
+            }
+        },
+        "JsonObject_8": {
+            "properties": {
+                "_links": {
+                    "$ref": "#/definitions/JsonObject_7"
+                },
+                "accountNo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "regNo": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
