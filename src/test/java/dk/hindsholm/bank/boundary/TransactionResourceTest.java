@@ -3,27 +3,24 @@ package dk.hindsholm.bank.boundary;
 import dk.hindsholm.bank.control.AccountAdministration;
 import dk.hindsholm.bank.entity.Account;
 import dk.hindsholm.bank.entity.Transaction;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
-
 import javax.json.JsonObject;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Before;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TransactionResourceTest {
 
     @Mock
@@ -38,7 +35,7 @@ public class TransactionResourceTest {
     @InjectMocks
     TransactionResource service;
 
-    @Before
+    @BeforeEach
     public void before() {
         when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromPath("http://mock"));        
     }

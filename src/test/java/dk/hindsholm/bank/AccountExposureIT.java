@@ -1,7 +1,6 @@
 package dk.hindsholm.bank;
 
 import java.util.HashMap;
-import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Map;
@@ -12,15 +11,9 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import org.junit.Before;
-import org.junit.ClassRule;
-
-import org.junit.Test;
-import pl.domzal.junit.docker.rule.DockerRule;
-import pl.domzal.junit.docker.rule.WaitFor;
 
 public class AccountExposureIT {
-
+/*
     @ClassRule
     // Start the Docker container
     public static DockerRule container = DockerRule.builder()
@@ -118,5 +111,5 @@ public class AccountExposureIT {
         assertEquals("1234567", response.get("accountNo"));
         assertEquals("new account name", response.get("name"));
     }
-
+*/
 }
