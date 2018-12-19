@@ -1,31 +1,45 @@
 package dk.hindsholm.bank;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.ws.rs.NotFoundException;
-
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@SuppressWarnings("rawtypes")
+@Testcontainers
 public class AccountExposureIT {
-/*
-    @ClassRule
-    // Start the Docker container
-    public static DockerRule container = DockerRule.builder()
-            .imageName("bank")
-            .waitFor(WaitFor.logMessage("bank was successfully deployed"))
-            .build();
+
+    @Container
+    static final GenericContainer CONTAINER = new GenericContainer(
+            new ImageFromDockerfile("bank")
+                    .withFileFromPath("./src/test/payara", Paths.get("./src/test/payara"))
+                    .withFileFromPath("./target/bank.war", Paths.get("./target/bank.war"))
+                    .withFileFromPath("Dockerfile", Paths.get("Dockerfile")))
+            .withExposedPorts(8080)
+            .waitingFor(Wait.forHttp("/bank/resources/health"));
 
     String dockerUrl;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        dockerUrl = "http://" + container.getDockerHost() + ":" + container.getExposedContainerPort("8080") + "/bank/resources";
+        dockerUrl = "http://" + CONTAINER.getContainerIpAddress() + ":" + CONTAINER.getMappedPort(8080) + "/bank/resources";
     }
 
     @Test
@@ -52,30 +66,32 @@ public class AccountExposureIT {
         assertEquals("Checkings Account", response.get("name"));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void testUnknownUser() {
         Map<String, String> accountCreate = new HashMap<>();
         accountCreate.put("regNo", "5479");
         accountCreate.put("accountNo", "123456");
         accountCreate.put("name", "Savings account");
         WebTarget target = ClientBuilder.newClient().target(dockerUrl);
-        target.path("accounts").path("dummy")
+        NotFoundException e = assertThrows(NotFoundException.class, () -> target.path("accounts").path("dummy")
                 .request()
                 .accept("application/json")
-                .put(Entity.entity(accountCreate, MediaType.APPLICATION_JSON_TYPE), Map.class);
+                .put(Entity.entity(accountCreate, MediaType.APPLICATION_JSON_TYPE), Map.class));
+        assertTrue(e.getMessage().contains("404"));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void testUserNotInRequiredGroup() {
         Map<String, String> accountCreate = new HashMap<>();
         accountCreate.put("regNo", "5479");
         accountCreate.put("accountNo", "123456");
         accountCreate.put("name", "Savings account");
         WebTarget target = ClientBuilder.newClient().register(new Authenticator("cust1", "passw0rd")).target(dockerUrl);
-        target.path("accounts").path("dummy")
+        NotFoundException e = assertThrows(NotFoundException.class, () -> target.path("accounts").path("dummy")
                 .request()
                 .accept("application/json")
-                .put(Entity.entity(accountCreate, MediaType.APPLICATION_JSON_TYPE), Map.class);
+                .put(Entity.entity(accountCreate, MediaType.APPLICATION_JSON_TYPE), Map.class));
+        assertTrue(e.getMessage().contains("404"));
     }
 
     @Test
@@ -111,5 +127,5 @@ public class AccountExposureIT {
         assertEquals("1234567", response.get("accountNo"));
         assertEquals("new account name", response.get("name"));
     }
-*/
+
 }
