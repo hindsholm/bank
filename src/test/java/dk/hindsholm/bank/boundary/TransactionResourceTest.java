@@ -45,13 +45,15 @@ public class TransactionResourceTest {
         Account account = mock(Account.class);
         when(account.getRegNo()).thenReturn("5479");
         when(account.getAccountNo()).thenReturn("123456");
-        when(account.getTransactions()).thenReturn(Collections.singleton(new Transaction(account, new BigDecimal("1234.42"), "description")));
+        when(account.getTransactions())
+                .thenReturn(Collections.singleton(new Transaction(account, new BigDecimal("1234.42"), "description")));
         when(admin.findAccount("5479", "123456")).thenReturn(Optional.of(account));
 
         JsonObject json = (JsonObject) service.list("5479", "123456").getEntity();
 
         assertEquals(1, json.getJsonObject("_embedded").getJsonArray("transactions").size());
-        assertEquals("http://mock/accounts/5479-123456/transactions", json.getJsonObject("_links").getJsonObject("self").getString("href"));
+        assertEquals("http://mock/accounts/5479-123456/transactions",
+                json.getJsonObject("_links").getJsonObject("self").getString("href"));
     }
 
     @Test
