@@ -21,7 +21,7 @@ steps:
 - name: maven-build
   image: nk_maven:3-eclipse-temurin-17
   commands:
-  - mvn test -B -V
+  - mvn verify -B -V
 
 - name: rebuild-cache
   image: meltwater/drone-cache
