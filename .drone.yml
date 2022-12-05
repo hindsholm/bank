@@ -21,7 +21,7 @@ steps:
 - name: maven-build
   image: maven:3-eclipse-temurin-8
   commands:
-  - mvn verify -B -V
+  - mvn clean verify -Dmaven.repo.local=.m2/repository -B -V
 
 - name: rebuild-cache
   image: meltwater/drone-cache
